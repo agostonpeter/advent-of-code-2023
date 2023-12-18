@@ -1,3 +1,4 @@
+import copy
 NORTH = 0
 EAST = 1
 SOUTH = 2
@@ -120,23 +121,46 @@ mirrorMap = read_input(file_path)
 # printMap(mirrorMap)
 
 print("============== PART ONE ==============")
-beams = [Beam()]
-# printBeams(beams)
-while len(beams)>0:
-    beam = beams.pop(0)
-    x = beam.entering[0]
-    y = beam.entering[1]
-    tile = mirrorMap[x][y]
-    assert isinstance(tile, Tile)
-    beams += tile.hitWithBeam(beam)
-    # printMap(mirrorMap)
-    # printBeams(beams)
-    # input()
+def findEnergizedTiles(beams, inputMap):
+    mirrorMap = copy.deepcopy(inputMap)
+    while len(beams)>0:
+        beam = beams.pop(0)
+        x = beam.entering[0]
+        y = beam.entering[1]
+        tile = mirrorMap[x][y]
+        assert isinstance(tile, Tile)
+        beams += tile.hitWithBeam(beam)
+        # printMap(mirrorMap)
+        # printBeams(beams)
+        # input()
 
-partOneResult = 0
-for line in mirrorMap:
-    for tile in line:
-        if tile.energized:
-            partOneResult+=1
+    result = 0
+    for line in mirrorMap:
+        for tile in line:
+            if tile.energized:
+                result+=1
+    return result
+partOneResult = findEnergizedTiles([Beam()], mirrorMap)
 print(partOneResult)
+
+print("============== PART TWO ==============")
+allPossibleBeams = []
+for x in range(Tile.maxX+1):
+    allPossibleBeams.append([Beam([x, 0],EAST)])
+    allPossibleBeams.append([Beam([x, Tile.maxY],WEST)])
+
+for y in range(Tile.maxY+1):
+    allPossibleBeams.append([Beam([0, y],SOUTH)])
+    allPossibleBeams.append([Beam([0, Tile.maxX],NORTH)])
+
+partTwoResult = 0
+for b, beams in enumerate(allPossibleBeams):
+    print(float(b)/float(len(allPossibleBeams)))
+    # printBeams(beams)
+    result = findEnergizedTiles(beams, mirrorMap)
+    # print(result)
+    if result > partTwoResult:
+        partTwoResult = result
+
+print(partTwoResult)
 
